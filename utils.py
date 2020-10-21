@@ -6,7 +6,7 @@ import json
 appid = None
 secret = None
 
-urlFormat = 'https://fanyi-api.baidu.com/api/trans/vip/translate?q={}&from=auto&to=zh&appid={}&salt={}&sign={}'.format
+urlFormat = 'https://fanyi-api.baidu.com/api/trans/vip/translate?q={}&from=auto&to=auto&appid={}&salt={}&sign={}'.format
 
 
 def getSign(appid, query, salt, secret):
