@@ -25,7 +25,7 @@ def getTranslate(query):
     print(str(jsonText))
     translateText = ""
     for result in jsonText["trans_result"]:
-        translateText += result["dst"]
+        translateText += (result["dst"] + "\n")
     return translateText
 
 
