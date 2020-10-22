@@ -15,7 +15,7 @@ urlFormat = "http://fanyi.youdao.com/openapi.do?keyfrom=neverland&key=969918857&
 def getTranslate(query):
     jsonObj = json.loads(requests.get(urlFormat(query)).text)
     print(jsonObj)
-    result = "翻译:\n"
+    result = ""
     if "translation" in jsonObj:
         for x in jsonObj["translation"]:
             result += ("    " + str(x) + "\n")
