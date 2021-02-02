@@ -2,17 +2,19 @@
 
 import PyQt5.QtCore as QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QDockWidget, QListWidget, QWidget, QLineEdit, QDateTimeEdit, QVBoxLayout, QHBoxLayout \
-        , QGridLayout, QLabel, QCheckBox
-from PyQt5.QtCore import Qt, QDateTime
+        , QGridLayout, QLabel, QCheckBox, QShortcut, QMessageBox
+from PyQt5.QtCore import Qt, QDateTime, QRect
+from PyQt5.QtGui import QKeySequence
 import os
 import baidudict
 import youdaodict
+from pyqtkeybind import keybinder       #全局快捷键
 
 # 应用程序的主Widget
 class MainWidget(QWidget):
-    def __init__(self, window):
+    def __init__(self, window:QMainWindow):
         super().__init__()
-        self.window = window
+        self.window_ = window
         self.initUI()
 
     def initUI(self):
@@ -32,38 +34,57 @@ class MainWidget(QWidget):
         grid.addWidget(label2, 1, 0)
         grid.addWidget(self.output, 1, 1, 1, 6)
         grid.addWidget(self.switch, 2, 1)
+        
         grid.addWidget(self.alwaysOnTop, 2, 2)
+        self.alwaysOnTop.stateChanged.connect(lambda: self.setAlwaysOnTop(self.alwaysOnTop))
+
         grid.addWidget(self.baidu, 2, 3)
         grid.addWidget(self.youdao, 2, 4)
-        vlayout.addLayout(grid)
-        vlayout.addStretch(1)
-        self.setLayout(vlayout)
-        self.alwaysOnTop.stateChanged.connect(lambda: self.setAlwaysOnTop(self.alwaysOnTop))
         self.baidu.stateChanged.connect(lambda: self.switchToBaidu())
         self.youdao.stateChanged.connect(lambda: self.switchToYoudao())
 
-    def setAlwaysOnTop(self, checkBox):
+        self.hotkeyCombo = "Alt+T"
+        self.hotkey = QCheckBox(self.hotkeyCombo)
+        self.hotkey.stateChanged.connect(lambda: self.onHotkeyChecked())
+        grid.addWidget(self.hotkey, 2, 5)
+        self.hotkey.setChecked(True)
+        self.onHotkeyChecked()
+
+        vlayout.addLayout(grid)
+        vlayout.addStretch(1)
+        self.setLayout(vlayout)
+
+    def setAlwaysOnTop(self, checkBox:QCheckBox):
         if checkBox.isChecked():
-            self.window.setWindowFlags(
-                self.window.windowFlags() |
+            self.window_.setWindowFlags(
+                self.window_.windowFlags() |
                 QtCore.Qt.WindowStaysOnTopHint
             )
         else:
-            self.window.setWindowFlags(
-                self.window.windowFlags() &
+            self.window_.setWindowFlags(
+                self.window_.windowFlags() &
                 ~QtCore.Qt.WindowStaysOnTopHint
             )
-        if not self.window.isVisible():
-            self.window.setVisible(True)
+        if not self.window_.isVisible():
+            self.window_.setVisible(True)
 
-    def onClipboradChanged(self):
-        if not self.switch.isChecked():
-            return
-        clipboard = QApplication.clipboard()
-        text = clipboard.text()
-        if text:
+    def onHotkeyChecked(self):
+        self.enableHotKey(self.hotkey.isChecked())
+
+    def onTriggerHotKey(self):
+        self.bringToFront()
+        text = os.popen('xsel').read()
+        self.doTranslation(text)
+
+    def enableHotKey(self, enable:bool):
+        if enable:
+            keybinder.register_hotkey(self.window_.winId(), self.hotkeyCombo,self.onTriggerHotKey)
+        else:
+            keybinder.unregister_hotkey(self.window_.winId(), self.hotkeyCombo)
+            
+    def doTranslation(self, text):
+        if type(text) is str:
             content = str(text)
-            print('onClipboradChanged---' + content + ' len = ' + str(len(content)))
             self.input.setText(content)
             translation = ""
             if self.baidu.isChecked():
@@ -71,6 +92,12 @@ class MainWidget(QWidget):
             elif self.youdao.isChecked():
                 translation = youdaodict.getTranslate(content)
             self.output.setText(translation)
+
+    def onClipboradChanged(self):
+        if not self.switch.isChecked():
+            return
+        clipboard = QApplication.clipboard()
+        self.doTranslation(clipboard.text())
 
     def switchToBaidu(self):
         if self.baidu.isChecked():
@@ -83,3 +110,14 @@ class MainWidget(QWidget):
             self.baidu.setCheckState(Qt.CheckState.Unchecked)
         else:
             self.baidu.setCheckState(Qt.CheckState.Checked)
+    
+    def bringToFront(self):  #还有点问题
+        window = self.window_
+        savedGeometry = QRect(window.geometry())
+        print("hello world " + str(window.isActiveWindow()) + ", " + str(savedGeometry))
+        window.hide()
+        window.setWindowState((window.windowState() & ~Qt.WindowMinimized) | Qt.WindowActive)
+        window.move(savedGeometry.left(), savedGeometry.top() + window.statusBar().height())
+        window.show()
+        window.raise_()
+        window.activateWindow()

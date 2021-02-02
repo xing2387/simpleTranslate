@@ -9,6 +9,20 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QClipboard
 from widgets import MainWidget
 
+from pyqtkeybind import keybinder       #全局快捷键
+from PyQt5.QtCore import QAbstractNativeEventFilter, QAbstractEventDispatcher
+
+
+class WinEventFilter(QAbstractNativeEventFilter):
+    def __init__(self, keybinder):
+        self.keybinder = keybinder
+        # print("WinEventFilter " + str(keybinder))
+        super().__init__()
+
+    def nativeEventFilter(self, eventType, message):
+        # print("nativeEventFilter " + str(eventType))
+        ret = self.keybinder.handler(eventType, message)
+        return ret, 0
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -31,12 +45,17 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.widget)
         self.setGeometry(200, 200, 400, 400)
         self.setWindowTitle('翻译')
-        self.show()
 
 
 def main():
     app = QApplication(sys.argv)
+    keybinder.init()
+    win_event_filter = WinEventFilter(keybinder)
+    event_dispatcher = QAbstractEventDispatcher.instance()
+    event_dispatcher.installNativeEventFilter(win_event_filter)
+    
     window = MainWindow()
+    window.show()
     sys.exit(app.exec_())
 
 

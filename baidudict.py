@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 import hashlib
 import time
 import requests
@@ -21,7 +23,7 @@ def getTranslate(query):
     sign = getSign(appid, query, salt, secret)
     url = urlFormat(query, appid, salt, sign)
     print(url)
-    jsonText =  json.loads(requests.get(url).text)
+    jsonText = json.loads(requests.get(url).text)
     print(str(jsonText))
     translateText = ""
     for result in jsonText["trans_result"]:
