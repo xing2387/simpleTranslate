@@ -24,7 +24,7 @@ class MainWidget(QWidget):
         self.input = QTextEdit()
         label2 = QLabel('翻译')
         self.output = QTextEdit()
-        self.switch = QCheckBox("开始")
+        self.switch = QCheckBox("剪贴板")
         self.alwaysOnTop = QCheckBox("置顶窗口")
         self.baidu = QCheckBox("百度")
         self.youdao = QCheckBox("有道")
