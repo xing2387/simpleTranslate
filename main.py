@@ -2,15 +2,11 @@
 # -*- coding:utf-8 -*-
 
 import sys
-import time
-import PyQt5.QtCore as QtCore
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QDockWidget, QListWidget
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QClipboard
+from PyQt5.QtWidgets import QApplication, QMainWindow
 from widgets import MainWidget
 
 from pyqtkeybind import keybinder       #全局快捷键
-from PyQt5.QtCore import QAbstractNativeEventFilter, QAbstractEventDispatcher
+from PyQt5.QtCore import Qt, QAbstractNativeEventFilter, QAbstractEventDispatcher
 
 
 class WinEventFilter(QAbstractNativeEventFilter):
@@ -29,7 +25,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowFlags(
             self.windowFlags() |
-            QtCore.Qt.Window 
+            Qt.Window 
             # QtCore.Qt.WindowStaysOnTopHint
         )
         self.init()
@@ -43,7 +39,7 @@ class MainWindow(QMainWindow):
     def init(self):
         self.widget = MainWidget(self)
         self.setCentralWidget(self.widget)
-        self.setGeometry(200, 200, 400, 400)
+        self.setGeometry(200, 200, 300, 400)
         self.setWindowTitle('翻译')
 
 

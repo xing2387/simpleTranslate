@@ -23,10 +23,17 @@ def getTranslate(query):
     sign = getSign(appid, query, salt, secret)
     url = urlFormat(query, appid, salt, sign)
     print(url)
-    jsonText = json.loads(requests.get(url).text)
-    print(str(jsonText))
+    jsonObj = None
+    try:
+        jsonObj = json.loads(requests.get(url).text)
+    except Exception as e:
+        print(e)
+    if jsonObj == None:
+        print("query for {} failed".format(query))
+        return
+    print(jsonObj)
     translateText = ""
-    for result in jsonText["trans_result"]:
+    for result in jsonObj["trans_result"]:
         translateText += (result["dst"] + "\n")
     return translateText
 

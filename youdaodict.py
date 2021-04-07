@@ -15,7 +15,14 @@ urlFormat = "http://fanyi.youdao.com/openapi.do?keyfrom=neverland&key=969918857&
 
 
 def getTranslate(query):
-    jsonObj = json.loads(requests.get(urlFormat(query)).text)
+    jsonObj = None
+    try:
+        jsonObj = json.loads(requests.get(urlFormat(query)).text)
+    except Exception as e:
+        print(e)
+    if jsonObj == None:
+        print("query for {} failed".format(query))
+        return
     print(jsonObj)
     result = ""
     if "translation" in jsonObj:

@@ -1,16 +1,13 @@
-# coding=utf-8
+# -*- coding:utf-8 -*-
 
-import PyQt5.QtCore as QtCore
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QDockWidget, QListWidget, QWidget, QLineEdit, QDateTimeEdit, QVBoxLayout, QHBoxLayout \
-        , QGridLayout, QLabel, QCheckBox, QShortcut, QMessageBox
-from PyQt5.QtCore import Qt, QDateTime, QRect
-from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QWidget, QVBoxLayout, \
+        QGridLayout, QLabel, QCheckBox
+from PyQt5.QtCore import Qt, QRect
 import os
 import baidudict
 import youdaodict
 from pyqtkeybind import keybinder       #全局快捷键
 
-# 应用程序的主Widget
 class MainWidget(QWidget):
     def __init__(self, window:QMainWindow):
         super().__init__()
@@ -20,35 +17,55 @@ class MainWidget(QWidget):
     def initUI(self):
         vlayout = QVBoxLayout()
         grid = QGridLayout()
+
+        def incColumn():
+            nonlocal column
+            result = column
+            column += 1
+            return result
+        row = 0
+        column = 0
         label1 = QLabel('原文')
+        grid.addWidget(label1, row, incColumn(), 1, 1)
         self.input = QTextEdit()
+        grid.addWidget(self.input, row, incColumn(), 1, 8)
+        row = 1
+        column = 0
         label2 = QLabel('翻译')
+        grid.addWidget(label2, row, incColumn(), 1, 1)
         self.output = QTextEdit()
+        grid.addWidget(self.output, row, incColumn(), 1, 8)
+
+        row = 2
+        column = 0
+        labelSpan = QLabel('')
+        grid.addWidget(labelSpan, row, incColumn(), 1, 1)
         self.switch = QCheckBox("剪贴板")
-        self.alwaysOnTop = QCheckBox("置顶窗口")
-        self.baidu = QCheckBox("百度")
-        self.youdao = QCheckBox("有道")
-        self.youdao.setCheckState(Qt.CheckState.Checked)
-        grid.addWidget(label1, 0, 0)
-        grid.addWidget(self.input, 0, 1, 1, 6)
-        grid.addWidget(label2, 1, 0)
-        grid.addWidget(self.output, 1, 1, 1, 6)
-        grid.addWidget(self.switch, 2, 1)
+        grid.addWidget(self.switch, row, incColumn())
         
-        grid.addWidget(self.alwaysOnTop, 2, 2)
-        self.alwaysOnTop.stateChanged.connect(lambda: self.setAlwaysOnTop(self.alwaysOnTop))
-
-        grid.addWidget(self.baidu, 2, 3)
-        grid.addWidget(self.youdao, 2, 4)
-        self.baidu.stateChanged.connect(lambda: self.switchToBaidu())
-        self.youdao.stateChanged.connect(lambda: self.switchToYoudao())
-
         self.hotkeyCombo = "Alt+T"
         self.hotkey = QCheckBox(self.hotkeyCombo)
         self.hotkey.stateChanged.connect(lambda: self.onHotkeyChecked())
-        grid.addWidget(self.hotkey, 2, 5)
-        self.hotkey.setChecked(True)
-        self.onHotkeyChecked()
+        # self.hotkey.setChecked(True)
+        # self.onHotkeyChecked()
+        grid.addWidget(self.hotkey, row, incColumn())
+
+        self.alwaysOnTop = QCheckBox("置顶窗口")
+        self.alwaysOnTop.stateChanged.connect(lambda: self.setAlwaysOnTop(self.alwaysOnTop))
+        grid.addWidget(self.alwaysOnTop, row, incColumn())
+
+        row = 3
+        column = 0
+        labelSpan = QLabel('')
+        grid.addWidget(labelSpan, row, incColumn(), 1, 1)
+        self.baidu = QCheckBox("百度")
+        self.baidu.stateChanged.connect(lambda: self.switchToBaidu())
+        grid.addWidget(self.baidu, row, incColumn())
+        self.youdao = QCheckBox("有道")
+        self.youdao.setCheckState(Qt.CheckState.Checked)
+        self.youdao.stateChanged.connect(lambda: self.switchToYoudao())
+        grid.addWidget(self.youdao, row, incColumn())
+
 
         vlayout.addLayout(grid)
         vlayout.addStretch(1)
@@ -58,12 +75,12 @@ class MainWidget(QWidget):
         if checkBox.isChecked():
             self.window_.setWindowFlags(
                 self.window_.windowFlags() |
-                QtCore.Qt.WindowStaysOnTopHint
+                Qt.WindowStaysOnTopHint
             )
         else:
             self.window_.setWindowFlags(
                 self.window_.windowFlags() &
-                ~QtCore.Qt.WindowStaysOnTopHint
+                ~Qt.WindowStaysOnTopHint
             )
         if not self.window_.isVisible():
             self.window_.setVisible(True)
@@ -73,14 +90,21 @@ class MainWidget(QWidget):
 
     def onTriggerHotKey(self):
         self.bringToFront()
-        text = os.popen('xsel').read()
+        text = ""
+        try:
+            text = os.popen('xsel').read()
+        except Exception as e:
+            self.input.setText(str(e))
         self.doTranslation(text)
 
     def enableHotKey(self, enable:bool):
-        if enable:
-            keybinder.register_hotkey(self.window_.winId(), self.hotkeyCombo,self.onTriggerHotKey)
-        else:
-            keybinder.unregister_hotkey(self.window_.winId(), self.hotkeyCombo)
+        try:
+            if enable:
+                keybinder.register_hotkey(self.window_.winId(), self.hotkeyCombo,self.onTriggerHotKey)
+            else:
+                keybinder.unregister_hotkey(self.window_.winId(), self.hotkeyCombo)
+        except Exception as e:
+            print(e)
             
     def doTranslation(self, text):
         if type(text) is str:
@@ -112,12 +136,13 @@ class MainWidget(QWidget):
             self.baidu.setCheckState(Qt.CheckState.Checked)
     
     def bringToFront(self):  #还有点问题
-        window = self.window_
-        savedGeometry = QRect(window.geometry())
-        print("hello world " + str(window.isActiveWindow()) + ", " + str(savedGeometry))
-        window.hide()
-        window.setWindowState((window.windowState() & ~Qt.WindowMinimized) | Qt.WindowActive)
-        window.move(savedGeometry.left(), savedGeometry.top() + window.statusBar().height())
-        window.show()
-        window.raise_()
-        window.activateWindow()
+        if not self.alwaysOnTop.isChecked():
+            window = self.window_
+            savedGeometry = QRect(window.geometry())
+            print("hello world " + str(window.isActiveWindow()) + ", " + str(savedGeometry))
+            window.hide()
+            window.setWindowState((window.windowState() & ~Qt.WindowMinimized) | Qt.WindowActive)
+            window.move(savedGeometry.left(), savedGeometry.top() + window.statusBar().height())
+            window.show()
+            window.raise_()
+            window.activateWindow()
