@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QWidget, QVBox
 from PyQt5.QtCore import Qt, QRect
 import os
 import baidudict
-import youdaodict
+import youdao2
 from pyqtkeybind import keybinder       #全局快捷键
 
 class MainWidget(QWidget):
@@ -41,6 +41,7 @@ class MainWidget(QWidget):
         labelSpan = QLabel('')
         grid.addWidget(labelSpan, row, incColumn(), 1, 1)
         self.switch = QCheckBox("剪贴板")
+        self.switch.stateChanged.connect(lambda: self.onClipboardChecked())
         grid.addWidget(self.switch, row, incColumn())
         
         self.hotkeyCombo = "Alt+T"
@@ -85,7 +86,17 @@ class MainWidget(QWidget):
         if not self.window_.isVisible():
             self.window_.setVisible(True)
 
+    def onClipboardChecked(self):
+        if self.switch.isChecked():
+            self.hotkey.setCheckState(Qt.CheckState.Unchecked)
+        else:
+            self.hotkey.setCheckState(Qt.CheckState.Checked)
+
     def onHotkeyChecked(self):
+        if self.hotkey.isChecked():
+            self.switch.setCheckState(Qt.CheckState.Unchecked)
+        else:
+            self.switch.setCheckState(Qt.CheckState.Checked)
         self.enableHotKey(self.hotkey.isChecked())
 
     def onTriggerHotKey(self):
@@ -114,7 +125,7 @@ class MainWidget(QWidget):
             if self.baidu.isChecked():
                 translation = baidudict.getTranslate(content)
             elif self.youdao.isChecked():
-                translation = youdaodict.getTranslate(content)
+                translation = youdao2.getTranslate(content)
             self.output.setText(translation)
 
     def onClipboradChanged(self):
@@ -134,7 +145,7 @@ class MainWidget(QWidget):
             self.baidu.setCheckState(Qt.CheckState.Unchecked)
         else:
             self.baidu.setCheckState(Qt.CheckState.Checked)
-    
+
     def bringToFront(self):  #还有点问题
         if not self.alwaysOnTop.isChecked():
             window = self.window_

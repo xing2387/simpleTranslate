@@ -6,7 +6,7 @@ import json
 
 # keyfrom和key来源：
 # 1.  https://www.cnblogs.com/zhuweiblog/p/5200777.html :
-# http://fanyi.youdao.com/openapi.do?keyfrom=youdaoci&key=694691143&type=data&doctype=xml&version=1.1&q=hello
+# http://fanyi.youdao.com/openapi.do?keyfrom=youdaoci&key=694691143&type=data&doctype=json&version=1.1&q=hello
 # 2.  https://blog.csdn.net/x_iya/article/details/45095693 :
 # http://fanyi.youdao.com/openapi.do?keyfrom=neverland&key=969918857&type=data&doctype=json&version=1.1&q=good
 # http://apii.dict.cn/mini.php?q=dog
