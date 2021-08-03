@@ -33,9 +33,8 @@ def getTranslate(query):
      elif "ce" in jsonObj:
           word = jsonObj["ce"]["word"]
           for w in word:
-               result += w["usphone"]+"\n" if "usphone" in w else ""
                for tr in w["trs"]:
-                    result += getCeStr(tr)
+                    result += getCeStr(tr["tr"])+"\n"
      return result
 
 
@@ -55,9 +54,11 @@ def getCeStr(dd):
                result += getCeStr(ll)
      elif type(dd) is dict:
           if "#text" in dd:
-               return dd["#text"]+"\n"
+               return dd["#text"]+" "
           for kk in list(dd.keys()):
                result += getCeStr(dd[kk])
+     elif type(dd) is str:
+          result += dd
      return result
 
 
