@@ -24,20 +24,20 @@ def getTranslate(query):
      result = ""
      if "fanyi" in jsonObj:
           result = jsonObj["fanyi"]["tran"]
-     elif "ec" in jsonObj:
+     if "ec" in jsonObj:
           result += "英汉翻译字典:\n"
           word = jsonObj["ec"]["word"]
           for w in word:
                result += w["usphone"]+"\n" if "usphone" in w else ""
                for tr in w["trs"]:
-                    result += getEcStr(tr)+"\n"
-     elif "ce" in jsonObj:
+                    result += getEcStr(tr)+"\n\n"
+     if "ce" in jsonObj:
           result += "汉英翻译字典:\n"
           word = jsonObj["ce"]["word"]
           for w in word:
                for tr in w["trs"]:
-                    result += getCeStr(tr["tr"])+"\n"
-     elif "web_trans" in jsonObj:
+                    result += getCeStr(tr["tr"])+"\n\n"
+     if "web_trans" in jsonObj:
           result += "网络释义:\n"
           webs = jsonObj["web_trans"]["web-translation"]
           for web in webs:

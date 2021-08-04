@@ -51,14 +51,14 @@ class MainWidget(QWidget):
         # self.onHotkeyChecked()
         grid.addWidget(self.hotkey, row, incColumn())
 
-        self.alwaysOnTop = QCheckBox("置顶窗口")
+        self.alwaysOnTop = QCheckBox("置顶")
         self.alwaysOnTop.stateChanged.connect(lambda: self.setAlwaysOnTop(self.alwaysOnTop))
         grid.addWidget(self.alwaysOnTop, row, incColumn())
 
-        row = 3
-        column = 0
-        labelSpan = QLabel('')
-        grid.addWidget(labelSpan, row, incColumn(), 1, 1)
+        # row = 3
+        # column = 0
+        # labelSpan = QLabel('')
+        # grid.addWidget(labelSpan, row, incColumn(), 1, 1)
         self.baidu = QCheckBox("百度")
         self.baidu.stateChanged.connect(lambda: self.switchToBaidu())
         grid.addWidget(self.baidu, row, incColumn())
@@ -67,6 +67,7 @@ class MainWidget(QWidget):
         self.youdao.stateChanged.connect(lambda: self.switchToYoudao())
         grid.addWidget(self.youdao, row, incColumn())
 
+        grid.setColumnStretch(0,0)
         grid.setRowStretch(1,2)
         grid.setRowStretch(0,1)
 
