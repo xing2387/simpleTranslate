@@ -39,7 +39,7 @@ class MainWindow(QMainWindow):
     def init(self):
         self.widget = MainWidget(self)
         self.setCentralWidget(self.widget)
-        self.setGeometry(200, 200, 300, 400)
+        self.setGeometry(200, 200, 400, 500)
         self.setWindowTitle('翻译')
 
 

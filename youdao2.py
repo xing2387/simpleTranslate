@@ -25,16 +25,24 @@ def getTranslate(query):
      if "fanyi" in jsonObj:
           result = jsonObj["fanyi"]["tran"]
      elif "ec" in jsonObj:
+          result += "英汉翻译字典:\n"
           word = jsonObj["ec"]["word"]
           for w in word:
                result += w["usphone"]+"\n" if "usphone" in w else ""
                for tr in w["trs"]:
                     result += getEcStr(tr)+"\n"
      elif "ce" in jsonObj:
+          result += "汉英翻译字典:\n"
           word = jsonObj["ce"]["word"]
           for w in word:
                for tr in w["trs"]:
                     result += getCeStr(tr["tr"])+"\n"
+     elif "web_trans" in jsonObj:
+          result += "网络释义:\n"
+          webs = jsonObj["web_trans"]["web-translation"]
+          for web in webs:
+               for tr in web["trans"]:
+                    result += getWebStr(tr)+"\n"
      return result
 
 
@@ -61,6 +69,14 @@ def getCeStr(dd):
           result += dd
      return result
 
+def getWebStr(dd):
+     result = ""
+     if "summary" in dd:
+          result += dd["value"] + ":\n"
+          lines = dd["summary"]["line"]
+          for line in lines:
+               result += line.replace("<b>","").replace("</b>","") + "\n"
+     return result
 
 
 

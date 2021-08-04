@@ -67,9 +67,10 @@ class MainWidget(QWidget):
         self.youdao.stateChanged.connect(lambda: self.switchToYoudao())
         grid.addWidget(self.youdao, row, incColumn())
 
+        grid.setRowStretch(1,2)
+        grid.setRowStretch(0,1)
 
         vlayout.addLayout(grid)
-        vlayout.addStretch(1)
         self.setLayout(vlayout)
 
     def setAlwaysOnTop(self, checkBox:QCheckBox):
